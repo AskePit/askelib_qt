@@ -60,6 +60,9 @@
 #include <qstring.h>
 #include <qendian.h>
 #include <qnumeric.h>
+#ifdef __SSE2__
+#include <emmintrin.h>
+#endif
 
 #include <limits.h>
 #include <limits>
