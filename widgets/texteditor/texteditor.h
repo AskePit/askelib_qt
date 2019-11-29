@@ -3,7 +3,7 @@
 #ifndef MEMORYTEXTEDITOR_H
 #define MEMORYTEXTEDITOR_H
 
-#include <std/mask.h>
+#include <askelib/std/mask.h>
 #include <QPlainTextEdit>
 #include "syntax.h"
 
