@@ -1,10 +1,10 @@
 include( ../common.pri )
 
-DESTDIR = $${ASKELIB_QT_LIB_PATH}
+DESTDIR = $${ASKELIBQT_LIB_PATH}
 
 TEMPLATE = lib
 CONFIG += staticlib
-TARGET = askelib_qt_std$${ASKELIB_QT_LIB_SUFFIX}
+TARGET = askelib_qt_std$${ASKELIBQT_LIB_SUFFIX}
 
 # Input
 HEADERS += \
