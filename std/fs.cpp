@@ -43,7 +43,7 @@ QString readFile(const QString &fileName)
 
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
         qWarning() << "Couldn't open" << fileName << "file.";
-        return QString::null;
+        return QString();
     }
 
     return QString(file.readAll());

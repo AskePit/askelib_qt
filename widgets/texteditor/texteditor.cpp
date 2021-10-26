@@ -93,7 +93,7 @@ void TextEditor::switchToType(Type::t type)
         const int tabStop = 4;
 
         QFontMetrics metrics(f);
-        setTabStopWidth(tabStop * metrics.width(' '));
+        setTabStopDistance(tabStop * metrics.boundingRect(' ').width());
 
         updateLineNumberAreaWidth(0);
         highlightCurrentLine();
@@ -155,7 +155,7 @@ void TextEditor::saveFile(const QString &fileName)
     QFile file(fileName);
     file.open(QIODevice::WriteOnly | QIODevice::Truncate);
     QTextStream ss(&file);
-    ss.setCodec("UTF-8");
+    ss.setEncoding(QStringConverter::Utf8);
     ss << toPlainText();
     file.close();
 }
@@ -220,7 +220,7 @@ int TextEditor::lineNumberAreaWidth()
         ++digits;
     }
 
-    int space = 3 + fontMetrics().width(QLatin1Char('9')) * digits + 15;
+    int space = 3 + fontMetrics().boundingRect(QLatin1Char('9')).width() * digits + 15;
 
     return space;
 }
@@ -275,8 +275,8 @@ void TextEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
 
     QTextBlock block = firstVisibleBlock();
     int blockNumber = block.blockNumber();
-    int top = (int) blockBoundingGeometry(block).translated(contentOffset()).top();
-    int bottom = top + (int) blockBoundingRect(block).height();
+    int top = static_cast<int>(blockBoundingGeometry(block).translated(contentOffset()).top());
+    int bottom = top + static_cast<int>(blockBoundingRect(block).height());
 
     while (block.isValid() && top <= event->rect().bottom()) {
         if (block.isVisible() && bottom >= event->rect().top()) {
@@ -289,7 +289,7 @@ void TextEditor::lineNumberAreaPaintEvent(QPaintEvent *event)
 
         block = block.next();
         top = bottom;
-        bottom = top + (int) blockBoundingRect(block).height();
+        bottom = top + static_cast<int>(blockBoundingRect(block).height());
         ++blockNumber;
     }
 }

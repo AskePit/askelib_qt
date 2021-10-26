@@ -36,14 +36,14 @@ ShellHighlighter::ShellHighlighter(QTextDocument *parent)
 void ShellHighlighter::highlightBlock(const QString &text_)
 {
     if(text_.startsWith('#') || text_.startsWith("rem ", Qt::CaseInsensitive)) {
-        setFormat(0, text_.size(), m_colors[HighlightElement::Comment]);
+        setFormat(0, static_cast<int>(text_.size()), m_colors[HighlightElement::Comment]);
         return;
     }
 
-    QStringRef text(&text_);
-    auto comands = text.split('|', QString::SkipEmptyParts);
+    QStringView text(text_);
+    auto comands = text.split(QStringLiteral("|"), Qt::SkipEmptyParts);
 
-    for(const QStringRef &comand : comands) {
+    for(const QStringView &comand : comands) {
         int i = 0;
         while(i < comand.size() && comand.at(i).isSpace()) { // eat whitespace
             ++i;
@@ -55,14 +55,14 @@ void ShellHighlighter::highlightBlock(const QString &text_)
             ++i;
         }
 
-        setFormat(comand.position(), i, m_colors[HighlightElement::Comand]);
+        setFormat(static_cast<int>(text_.data() - comand.data()), i, m_colors[HighlightElement::Comand]);
     }
 
     auto doRegexp = [&text_, this](HighlightElement el, const QString &regexp){
         QRegularExpressionMatchIterator matchIterator = QRegularExpression(regexp).globalMatch(text_);
         while (matchIterator.hasNext()) {
             QRegularExpressionMatch match = matchIterator.next();
-            setFormat(match.capturedStart(), match.capturedLength(), m_colors[el]);
+            setFormat(static_cast<int>(match.capturedStart()), static_cast<int>(match.capturedLength()), m_colors[el]);
         }
     };
 

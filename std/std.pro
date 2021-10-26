@@ -8,18 +8,7 @@ TARGET = askelib_qt_std$${ASKELIBQT_LIB_SUFFIX}
 
 # Input
 HEADERS += \
-    fs.h \
-    pitm/pitmarray.h \
-    pitm/pitmdocument.h \
-    pitm/pitmobject.h \
-    pitm/pitmvalue.h
+    fs.h
 
 SOURCES += \
-    fs.cpp \
-    pitm/pitmarray.cpp \
-    pitm/pitmdocument.cpp \
-    pitm/pitmobject.cpp \
-    pitm/pitmvalue.cpp \
-    pitm/pitmparser.cpp \
-    pitm/pitmwriter.cpp \
-    pitm/pitm.cpp
+    fs.cpp

@@ -1,7 +1,5 @@
 #include "ini.h"
 
-#include <QRegularExpressionMatchIterator>
-
 namespace aske {
 
 IniHighlighter::IniHighlighter(QTextDocument *parent)
@@ -14,15 +12,15 @@ IniHighlighter::IniHighlighter(QTextDocument *parent)
 
 void IniHighlighter::highlightBlock(const QString &text)
 {
-    QStringRef r(&text);
+    QStringView r(text);
     r = r.trimmed();
 
     if(r.startsWith('[')) {
-        setFormat(0, text.size(), m_sectionFormat);
+        setFormat(0, static_cast<int>(text.size()), m_sectionFormat);
     } else if(r.startsWith(';') || r.startsWith('#')) {
-        setFormat(0, text.size(), m_commentFormat);
+        setFormat(0, static_cast<int>(text.size()), m_commentFormat);
     } else {
-        int i = text.indexOf('=');
+        qsizetype i = text.indexOf('=');
         if(i != -1) {
             setFormat(0, i+1, m_keyFormat);
         }

@@ -11,8 +11,9 @@
 #include <QResizeEvent>
 #include <QMessageBox>
 #include <QScrollBar>
-#include <QDesktopWidget>
+#include <QScreen>
 #include <QDirIterator>
+#include <QRegularExpression>
 #include <functional>
 
 namespace aske
@@ -21,25 +22,26 @@ namespace aske
 bool fileBelongsTo(const QString &file, const QStringList &list)
 {
     for(const auto &ext : list) {
-        QRegExp reg {ext, Qt::CaseInsensitive, QRegExp::Wildcard};
-        if(reg.exactMatch(file)) {
+        QString wildcard = QRegularExpression::wildcardToRegularExpression(ext);
+        QRegularExpression reg {wildcard, QRegularExpression::CaseInsensitiveOption};
+        if(reg.match(file, 0, QRegularExpression::PartialPreferCompleteMatch).hasMatch()) {
             return true;
         }
     }
     return false;
 }
 
-QRect screen()
+QRect getScreen()
 {
-    return QApplication::desktop()->screenGeometry();
+    return QApplication::screens().at(0)->geometry();
 }
 
 void centerScrollArea(QScrollArea *area, QLabel* label)
 {
-    auto screen { QApplication::desktop()->screenGeometry() };
+    auto screen { getScreen() };
     auto pixmap { label->pixmap() };
-    int w { (pixmap->width() - screen.width() + MediaWidgetTune::screen::reserve)/2 };
-    int h { (pixmap->height() - screen.height() + MediaWidgetTune::screen::reserve)/2 };
+    int w { (pixmap.width() - screen.width() + MediaWidgetTune::screen::reserve)/2 };
+    int h { (pixmap.height() - screen.height() + MediaWidgetTune::screen::reserve)/2 };
 
     area->horizontalScrollBar()->setValue(w);
     area->verticalScrollBar()->setValue(h);
@@ -241,8 +243,8 @@ void MediaWidget::calcImageFactor()
     int w { m_image.width() };
     int h { m_image.height() };
 
-    qreal sW = screen().width() - MediaWidgetTune::screen::reserve;
-    qreal sH = screen().height() - MediaWidgetTune::screen::reserve;
+    qreal sW = getScreen().width() - MediaWidgetTune::screen::reserve;
+    qreal sH = getScreen().height() - MediaWidgetTune::screen::reserve;
 
     qreal wRatio { sW/w };
     qreal hRatio { sH/h };
@@ -298,7 +300,7 @@ void MediaWidget::applyImage()
 {
     using namespace MediaWidgetTune;
 
-    if(m_scaleFactor == zoom::origin) {
+    if(qFuzzyCompare(m_scaleFactor, zoom::origin)) {
         m_imageView.setPixmap(QPixmap::fromImage(m_image));
     } else {
         m_imageView.setPixmap(QPixmap::fromImage(m_image)
@@ -380,7 +382,7 @@ void MediaWidget::gotoNextFile(Direction dir)
 {
     QFileInfoList files { getDirFiles(m_currentFile.dir().path()) };
 
-    int i { files.indexOf(m_currentFile) };
+    qsizetype i { files.indexOf(m_currentFile) };
     if(dir == Direction::Backward) {
         i -= 1;
         if(i < 0) {
@@ -499,7 +501,8 @@ bool MediaWidget::event(QEvent *event)
 
         case QEvent::Wheel: {
             QWheelEvent *wheelEvent { static_cast<QWheelEvent *>(event) };
-            Direction dir { wheelEvent->delta() > 0 ? Direction::Forward : Direction::Backward };
+            auto delta = wheelEvent->pixelDelta();
+            Direction dir { (delta.x() > 0 && delta.y() > 0) ? Direction::Forward : Direction::Backward };
             zoomOrVolumeStep(dir, InputType::Wheel);
             return true;
         } break;
