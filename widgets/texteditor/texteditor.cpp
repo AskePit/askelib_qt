@@ -37,7 +37,7 @@ void TextEditor::updateLook()
     // if there is only one allowed type - switch to it, there is no alternatives
     auto unique = m_allowedTypes.unique();
     if(unique) {
-        Type::t t(static_cast<Type::t>(unique.get()));
+        Type::t t(static_cast<Type::t>(unique.value()));
         switchToType(t);
         return;
     }
