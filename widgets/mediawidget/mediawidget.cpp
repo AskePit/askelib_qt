@@ -22,9 +22,7 @@ namespace aske
 bool fileBelongsTo(const QString &file, const QStringList &list)
 {
     for(const auto &ext : list) {
-        QString wildcard = QRegularExpression::wildcardToRegularExpression(ext);
-        QRegularExpression reg {wildcard, QRegularExpression::CaseInsensitiveOption};
-        if(reg.match(file, 0, QRegularExpression::PartialPreferCompleteMatch).hasMatch()) {
+        if(file.toLower().endsWith(QString(".%1").arg(ext))) {
             return true;
         }
     }
